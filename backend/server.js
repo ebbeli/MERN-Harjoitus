@@ -4,6 +4,8 @@ const usersRoutes = require("./routes/users-routes");
 const storiesRoutes = require("./routes/stories-routes");
 const mongoose = require("mongoose");
 const cors = require("cors");
+const cookieSession = require("cookie-session");
+const { password, ip } = require("./config/password");
 
 // routermäärittelyt tänne
 
@@ -16,9 +18,12 @@ const app = express();
 app.use(bodyParser.json());
 
 //Sallitaan cors pyynnöt front-endistä
+
+// parse requests of content-type - application/x-www-form-urlencoded
+
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: ip + ":3000",
   })
 );
 
@@ -35,8 +40,6 @@ app.use((error, req, res, next) => {
     .send({ message: error.message || "Unknown error" });
 });
 
-const password = "testi123";
-
 const uri =
   "mongodb+srv://dbuser:" +
   password +
@@ -45,9 +48,7 @@ const uri =
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(5000, () =>
-      console.log("API is running on http://localhost:5000/")
-    );
+    app.listen(5000, () => console.log("API is running on " + ip + ":5000/"));
   })
   .catch((err) => {
     console.log(err);

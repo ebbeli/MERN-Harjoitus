@@ -1,7 +1,9 @@
-const express = require('express');
-const HttpError = require('../models/http-error');
-const User = require('../models/user');
-const mongoose = require('mongoose');
+const express = require("express");
+const HttpError = require("../models/http-error");
+const User = require("../models/user");
+const { authJwt } = require("../middleware/auth-check");
+const mongoose = require("mongoose");
+const config = require("../config/auth.config");
 
 /*
 function updateByKey(obj, updatedObj) {
@@ -29,92 +31,127 @@ const updateUserById = (req, res, next) => {
 }*/
 
 const countUsers = async (req, res, next) => {
-    try {
-    await User.countDocuments({}, function (err, count){
-        console.log('There are ' + count + ' users');      
-        return res.status(201).json({message : 'User count is ' + count});
-    })
-    } catch{
-        next(new HttpError("Counting failed, please try again!", 500));
-    }
-}
+  try {
+    await User.countDocuments({}, function (err, count) {
+      console.log("There are " + count + " users");
+      return res.status(201).json({ message: "User count is " + count });
+    });
+  } catch {
+    next(new HttpError("Counting failed, please try again!", 500));
+  }
+};
 
 const createUser = async (req, res, next) => {
-    const {email, password, name, city, birthyear, picurl} = req.body;
-        const createdUser = new User ({
-            email,
-            password,
-            name,
-            city,
-            birthyear,
-            picurl
-        });
+  const { email, password, name, city, birthyear, picurl } = req.body;
+  const createdUser = new User({
+    email,
+    password,
+    name,
+    city,
+    birthyear,
+    picurl,
+  });
 
-        try {
-            await createdUser.save();
-        }catch (err){
-            return next(new HttpError("Creating user failed, please try again!", 500));
-        }
-    res.status(201).json({message: 'Created user: ' + name});
-}
+  try {
+    await createdUser.save();
+  } catch (err) {
+    return next(new HttpError("Creating user failed, please try again!", 500));
+  }
+  res.status(201).json({ message: "Created user: " + name });
+};
 
-
-const deleteUserById =  async (req, res, next) => {
-    const userId = req.params.uid;
-    await User.deleteOne({_id: userId }).then(function(){
-        console.log("Data deleted"); // Success
-    }).catch(function(error){
-        console.log(error); // Failure
+const deleteUserById = async (req, res, next) => {
+  const userId = req.params.uid;
+  await User.deleteOne({ _id: userId })
+    .then(function () {
+      console.log("Data deleted"); // Success
+    })
+    .catch(function (error) {
+      console.log(error); // Failure
     });
-}
+};
 
 const getAllUsers = async (req, res, next) => {
-    let allUsers = [];
-    try{
+  let allUsers = [];
+  try {
+    allUsers = await User.find({}).select("-password").select("-email");
+    console.log(allUsers);
+  } catch {
+    return next(
+      new HttpError("Could not retrieve users data, please try again!", 500)
+    );
+  }
+  if (allUsers === [] || allUsers === null) {
+    console.log("No users found");
+    return next(
+      new HttpError("Could not find users(Maybe there is no users)", 404)
+    );
+  } else {
+    res.status(200).json(allUsers);
+    console.log("getAllUsers works");
+  }
+};
 
-        allUsers = await User.find({}).select('-password').select('-email');
-        console.log(allUsers);
+const getUserById = async (req, res, next) => {
+  const userId = req.params.uid;
+  let user;
+  try {
+    user = await User.findOne({ _id: userId });
+  } catch {
+    console.log("getUser: id not found");
+    return next(new HttpError("User not retrieved, try again", 500));
+  }
+  if (!user || user === null) {
+    console.log("getUser - Id: " + userId + " did not match");
+    return next(new HttpError("User not found,", 404));
+  }
+  res.status(200).json({ user });
+  console.log("getUser works");
+};
 
-    }catch{
-        return next(new HttpError("Could not retrieve users data, please try again!", 500));
+var jwt = require("jsonwebtoken");
+
+const login = async (req, res) => {
+  console.log(req);
+  User.findOne({ email: req.body.email }).exec((err, user) => {
+    if (err) {
+      res.status(500).send({ message: err });
+      return;
     }
-    if(allUsers === [] || allUsers === null){
-        console.log("No users found");
-        return next(new HttpError('Could not find users(Maybe there is no users)', 404));
-    }else{
-        res.status(200).json(allUsers);
-        console.log("getAllUsers works");
-    }
-}
 
-const getUserById = async (req, res, next)  => {
-    const userId = req.params.uid;
-    let user;
-    try{
-        user = await User.findOne({_id: userId});   
-    }catch{
-        console.log("getUser: id not found");
-        return next(new HttpError('User not retrieved, try again', 500))
+    if (!user) {
+      return res.status(404).send({ message: "User Not found." });
     }
-    if(!user || user === null){
-        console.log("getUser - Id: " + userId +  " did not match");
-        return next(new HttpError('User not found,', 404))
+
+    var passwordIsValid = req.body.password == user.password ? "True" : "False";
+
+    if (!passwordIsValid) {
+      return res.status(401).send({ message: "Invalid Password!" });
     }
-    res.status(200).json({user});
-    console.log("getUser works");
-}
 
-
-const login = (req, res, next) => {
-    res.send({
-        "token": 'test',
-        "uid": "62fa2ebc0fa49e3840a9dbd1"
+    var token = jwt.sign({ id: user._id }, config.secret, {
+      expiresIn: 86400, // 24 hours
     });
-}
+
+    req.session.token = token;
+
+    res.status(200).send({
+      id: user._id,
+      username: user.name,
+      email: user.email,
+    });
+  });
+};
+const login1 = (re, res) => {
+  res.send({
+    token: "test",
+    uid: "62fa2ebc0fa49e3840a9dbd1",
+  });
+};
 
 exports.createUser = createUser;
 exports.deleteUser = deleteUserById; // delete user
 exports.getUser = getUserById;
 exports.getAll = getAllUsers;
-exports.login = login;
+exports.login = login1;
 exports.count = countUsers; // Count users
