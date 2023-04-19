@@ -35,7 +35,7 @@ app.use((error, req, res, next) => {
     .send({ message: error.message || "Unknown error" });
 });
 
-const password = asd;
+const password = "testi123";
 
 const uri =
   "mongodb+srv://dbuser:" +
