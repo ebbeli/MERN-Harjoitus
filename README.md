@@ -12,7 +12,7 @@ MongoDB-connection not working, because I erased the password mongoose.connect()
 
 3. Add image upload 
 
-3.1 Edit story-model 
+3.1. Edit story-model 
 3.2 -controller.
 3.2 PostStory.js
 
