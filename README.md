@@ -11,10 +11,9 @@ MongoDB-connection not working, because I erased the password mongoose.connect()
 2. Retirieve data for story editing. (Edit works, fields just empty)
 
 3. Add image upload 
-
-3.1. Edit story-model 
-3.2 -controller.
-3.2 PostStory.js
+Edit story-model 
+Edit story-controller.
+PostStory.js
 
 4. Add commenting.
 1 Comment Model
