@@ -7,5 +7,6 @@ router.get("/user/:uid", storiesControllers.getUsersStories);
 router.get("/", storiesControllers.getAll);
 router.post("/", storiesControllers.newStory);
 router.get("/:id", storiesControllers.getStory);
+router.post("/delete", storiesControllers.deleteStory);
 
 module.exports = router;

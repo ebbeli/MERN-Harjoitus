@@ -4,8 +4,6 @@ import Card from "react-bootstrap/Card";
 import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Register from "./elements/Register";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { ip } from "../ip.js";
 
 /*

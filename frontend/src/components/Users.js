@@ -7,6 +7,7 @@ import { ip } from "../ip.js";
 
 const UserRows = () => {
   const [users, setUsers] = useState([]);
+  const [loading, setLoading] = useState([true]);
   function getYear() {
     return new Date().getFullYear();
   }
@@ -17,6 +18,7 @@ const UserRows = () => {
       .then((responseData) => {
         console.log(responseData);
         setUsers(responseData);
+        setLoading(false);
       })
       .catch((error) => console.log(error));
   }, []);
@@ -31,6 +33,9 @@ const UserRows = () => {
       <td>{currentYear - user.birthyear}</td>
     </tr>
   ));
+  if (loading) {
+    return <tbody>Lataa..</tbody>;
+  }
   return <tbody>{listUsers}</tbody>;
 };
 

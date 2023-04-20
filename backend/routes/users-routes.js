@@ -9,7 +9,7 @@ const router = express.Router();
 router.get("/count", usersControllers.count);
 
 router.get("/", usersControllers.getAll);
-router.post("/login", usersControllers.login);
+router.get("/login", usersControllers.login);
 router.post("/signup", usersControllers.createUser);
 router.delete("/delete/:uid", usersControllers.deleteUser);
 router.get("/:uid", usersControllers.getUser);

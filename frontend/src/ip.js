@@ -1,2 +1,2 @@
 //node local + port
-export const ip = "http://192.168.1.114:5000";
+export const ip = "http://localhost:5000";
