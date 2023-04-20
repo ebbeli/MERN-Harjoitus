@@ -2,8 +2,20 @@
 
 Simple biking trip diary made with MongoDB, Express, React & Node.js
 
-Backend & Middleware works. To test stories, you need to use api-endpoints with postman etc.
-
 MongoDB-connection not working, because I erased the password mongoose.connect() for github.
 
-Frontend still in progress. Registration works. Login is hardcoded. Stories need to be reconfigured for backend compatibility.
+##ToDo
+
+1. Crypt and DeCrtypt passwords
+
+2. Retirieve data for story editing. (Edit works, fields just empty)
+
+3.Add image upload
+
+4. Add commenting.
+
+5. Login and content control with cookies
+
+6. Styling
+
+7. Local MongoDB for easier testing?
