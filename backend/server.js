@@ -5,7 +5,7 @@ const storiesRoutes = require("./routes/stories-routes");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const cookieSession = require("cookie-session");
-const { password, ip } = require("./config/password");
+var ip = require("ip");
 
 // routermäärittelyt tänne
 
@@ -21,11 +21,7 @@ app.use(bodyParser.json());
 
 // parse requests of content-type - application/x-www-form-urlencoded
 
-app.use(
-  cors({
-    origin: ip + ":3000",
-  })
-);
+app.use(cors({}));
 
 app.use("/api/users", usersRoutes);
 
@@ -42,13 +38,15 @@ app.use((error, req, res, next) => {
 
 const uri =
   "mongodb+srv://dbuser:" +
-  password +
+  process.env.REACT_PASSWORD +
   "@cluster0.kkexnr0.mongodb.net/MernDB?retryWrites=true&w=majority";
 
 mongoose
   .connect(uri, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(() => {
-    app.listen(5000, () => console.log("API is running on " + ip + ":5000/"));
+    app.listen(5000, () =>
+      console.log("API is running on " + ip.address() + ":5000/")
+    );
   })
   .catch((err) => {
     console.log(err);

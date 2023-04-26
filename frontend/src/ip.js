@@ -1,2 +1,3 @@
 //node local + port
-export const ip = "http://localhost:5000";
+var theIp = require("ip");
+export const ip = "http://" + theIp.address() + ":5000";
